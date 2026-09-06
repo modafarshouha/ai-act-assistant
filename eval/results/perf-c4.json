@@ -1,0 +1,23 @@
+{
+  "provider": "dummy",
+  "requests": 100,
+  "concurrency": 4,
+  "failures": 0,
+  "throughput_rps": 1.955,
+  "latency_ms": {
+    "p50": 1975.5,
+    "p90": 2737.8,
+    "p95": 2997.6,
+    "p99": 3897.4,
+    "max": 3897.4
+  },
+  "node_mean_ms": {
+    "retrieve": 1985.1,
+    "synthesize": 2.3,
+    "verify": 2.0,
+    "tool_executor": 1.7,
+    "planner": 0.4,
+    "triage": 0.1,
+    "finalize": 0.1
+  }
+}

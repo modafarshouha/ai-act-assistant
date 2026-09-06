@@ -1,0 +1,11 @@
+.venv/
+.git/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.env
+data/index/
+eval/results/
+tests/
+INTERVIEW_NOTES.md

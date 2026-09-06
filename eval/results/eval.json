@@ -1,0 +1,65 @@
+{
+  "provider": "dummy",
+  "model": "deterministic-test-double",
+  "retrieval": {
+    "recall@1": {
+      "hits": 17,
+      "total": 22,
+      "rate": 0.7727
+    },
+    "recall@5": {
+      "hits": 22,
+      "total": 22,
+      "rate": 1.0
+    },
+    "recall@20": {
+      "hits": 22,
+      "total": 22,
+      "rate": 1.0
+    },
+    "reranked recall@1": {
+      "hits": 19,
+      "total": 22,
+      "rate": 0.8636
+    },
+    "mrr": 0.8712,
+    "superseded_with_filter": 0,
+    "superseded_without_filter": 181,
+    "latency_p50_ms": 559.4,
+    "latency_p95_ms": 844.1
+  },
+  "graph": {
+    "scope classification": {
+      "hits": 18,
+      "total": 18,
+      "rate": 1.0
+    },
+    "tool selection": {
+      "hits": 11,
+      "total": 11,
+      "rate": 1.0
+    },
+    "tool arguments": {
+      "hits": 4,
+      "total": 4,
+      "rate": 1.0
+    },
+    "citation correctness": {
+      "hits": 8,
+      "total": 8,
+      "rate": 1.0
+    },
+    "multi-hop decomposition": {
+      "hits": 1,
+      "total": 1,
+      "rate": 1.0
+    },
+    "verified grounded": {
+      "hits": 16,
+      "total": 16,
+      "rate": 1.0
+    },
+    "latency_p50_ms": 568.8,
+    "latency_p95_ms": 1120.4
+  }
+}

@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    image: ai-act-assistant:latest
+    ports:
+      - "8501:8501"
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-dummy}
+      OLLAMA_BASE_URL: http://ollama:11434
+    restart: unless-stopped
+
+  # Only starts with --profile llm. Without it the app runs on the
+  # deterministic provider and needs no model download.
+  ollama:
+    profiles: ["llm"]
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: "-1"
+
+volumes:
+  ollama-models:

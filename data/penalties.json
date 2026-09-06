@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0",
+  "description": "Administrative fine tiers for the AI Act and GDPR. Held as data rather than as constants in the calculator so that a corrected amount is a data change, not a code change. Every quote is located in the vendored corpus by tests/test_corpus_facts.py.",
+  "comparator_note": "The base tiers all resolve to the HIGHER of the fixed ceiling and the turnover percentage. Two provisions invert that comparator to the LOWER, and the inversion is the single most commonly mis-stated part of the AI Act penalty regime: AI Act Art. 99(6) inverts it for SMEs across all three tiers, while Art. 99(6a) inverts it for SMCs across paragraphs 4 and 5 only. An SMC committing a prohibited practice therefore gets no relief.",
+  "regimes": [
+    {
+      "id": "ai_act_art99",
+      "regulation": "AI Act",
+      "legal_basis": "AI Act Art. 99",
+      "source_key": "ai_act_consolidated",
+      "applies_to": "Operators, imposed by Member States.",
+      "tiers": [
+        {
+          "id": "aia_prohibited",
+          "paragraph": "99(3)",
+          "subject": "Non-compliance with the Article 5 prohibited AI practices.",
+          "amount_eur": 35000000,
+          "turnover_pct": 7.0,
+          "comparator": "higher",
+          "quote": "administrative fines of up to EUR 35 000 000 or, if the offender is an undertaking, up to 7 % of its total worldwide annual turnover for the preceding financial year, whichever is higher"
+        },
+        {
+          "id": "aia_obligations",
+          "paragraph": "99(4)",
+          "subject": "Non-compliance with obligations of providers (Art. 16), authorised representatives (Art. 22), importers (Art. 23), distributors (Art. 24), providers and deployers under Art. 25(2) and (4), deployers (Art. 26), notified bodies (Arts. 31, 33(1), (3), (4), 34), and transparency under Art. 50.",
+          "amount_eur": 15000000,
+          "turnover_pct": 3.0,
+          "comparator": "higher",
+          "quote": "administrative fines of up to EUR 15 000 000 or, if the offender is an undertaking, up to 3 % of its total worldwide annual turnover for the preceding financial year, whichever is higher"
+        },
+        {
+          "id": "aia_misinformation",
+          "paragraph": "99(5)",
+          "subject": "Supplying incorrect, incomplete or misleading information to notified bodies or national competent authorities in reply to a request.",
+          "amount_eur": 7500000,
+          "turnover_pct": 1.0,
+          "comparator": "higher",
+          "quote": "administrative fines of up to EUR 7 500 000 or, if the offender is an undertaking, up to 1 % of its total worldwide annual turnover for the preceding financial year, whichever is higher"
+        }
+      ],
+      "modifiers": [
+        {
+          "id": "sme",
+          "paragraph": "99(6)",
+          "entity": "SMEs, including start-ups",
+          "comparator": "lower",
+          "applies_to_tiers": ["aia_prohibited", "aia_obligations", "aia_misinformation"],
+          "quote": "In the case of SMEs, including start-ups, each fine referred to in this Article shall be up to the percentages or amount referred to in paragraphs 3, 4 and 5, whichever thereof is lower.",
+          "amended_by": null
+        },
+        {
+          "id": "smc",
+          "paragraph": "99(6a)",
+          "entity": "SMCs (small mid-cap enterprises)",
+          "comparator": "lower",
+          "applies_to_tiers": ["aia_obligations", "aia_misinformation"],
+          "quote": "In the case of SMCs, each fine referred to in paragraphs 4 and 5 shall be up to the percentages or amount referred therein, whichever is lower.",
+          "amended_by": "Regulation (EU) 2026/1744",
+          "note": "Inserted by the Digital Omnibus. Paragraph 3 is deliberately absent from its scope, so an SMC that commits a prohibited practice faces the full higher-of comparator."
+        }
+      ]
+    },
+    {
+      "id": "ai_act_art100",
+      "regulation": "AI Act",
+      "legal_basis": "AI Act Art. 100",
+      "source_key": "ai_act_consolidated",
+      "applies_to": "Union institutions, bodies, offices and agencies, imposed by the European Data Protection Supervisor.",
+      "tiers": [
+        {
+          "id": "aia_eu_body_prohibited",
+          "paragraph": "100(2)",
+          "subject": "Non-compliance with the Article 5 prohibited AI practices.",
+          "amount_eur": 1500000,
+          "turnover_pct": null,
+          "comparator": "flat",
+          "quote": "administrative fines of up to EUR 1 500 000"
+        },
+        {
+          "id": "aia_eu_body_other",
+          "paragraph": "100(3)",
+          "subject": "Non-compliance with any other requirement or obligation under the Regulation.",
+          "amount_eur": 750000,
+          "turnover_pct": null,
+          "comparator": "flat",
+          "quote": "administrative fines of up to EUR 750 000"
+        }
+      ],
+      "modifiers": [],
+      "note": "Flat ceilings with no turnover limb, because a Union institution has a budget rather than a turnover. Art. 100(1)(g) directs the EDPS to have regard to that annual budget."
+    },
+    {
+      "id": "gdpr_art83",
+      "regulation": "GDPR",
+      "legal_basis": "GDPR Art. 83",
+      "source_key": "gdpr",
+      "applies_to": "Controllers and processors, imposed by supervisory authorities.",
+      "tiers": [
+        {
+          "id": "gdpr_lower",
+          "paragraph": "83(4)",
+          "subject": "Obligations of controllers and processors under Arts. 8, 11, 25 to 39, 42 and 43, of certification bodies, and of monitoring bodies.",
+          "amount_eur": 10000000,
+          "turnover_pct": 2.0,
+          "comparator": "higher",
+          "quote": "administrative fines up to 10 000 000 EUR, or in the case of an undertaking, up to 2 % of the total worldwide annual turnover of the preceding financial year, whichever is higher"
+        },
+        {
+          "id": "gdpr_upper",
+          "paragraph": "83(5)",
+          "subject": "Basic principles for processing and conditions for consent (Arts. 5, 6, 7, 9), data subjects' rights (Arts. 12 to 22), transfers to third countries (Arts. 44 to 49), national-law obligations under Chapter IX, and non-compliance with a supervisory authority order under Art. 58(2).",
+          "amount_eur": 20000000,
+          "turnover_pct": 4.0,
+          "comparator": "higher",
+          "quote": "administrative fines up to 20 000 000 EUR, or in the case of an undertaking, up to 4 % of the total worldwide annual turnover of the preceding financial year, whichever is higher"
+        }
+      ],
+      "modifiers": [],
+      "note": "Two tiers, not three, and no SME or SMC relief anywhere in Article 83. The ceiling is written amount-then-currency ('20 000 000 EUR'), the inverse of the AI Act's 'EUR 35 000 000'. Art. 83(6) repeats the upper tier for non-compliance with a supervisory authority order."
+    }
+  ]
+}

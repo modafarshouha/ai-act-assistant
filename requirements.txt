@@ -1,0 +1,17 @@
+langgraph==1.2.11
+langchain-core==1.6.1
+
+# ONNX, not sentence-transformers. Same model without dragging torch in.
+fastembed==0.8.0
+onnxruntime==1.29.0
+faiss-cpu==1.15.0
+rank_bm25==0.2.2
+
+streamlit==1.63.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+httpx==0.28.1
+PyYAML==6.0.3
+
+# faiss-cpu 1.15 is built against numpy 2.x; pinning <2 breaks it.
+numpy==2.5.2
