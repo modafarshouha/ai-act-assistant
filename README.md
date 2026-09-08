@@ -55,9 +55,13 @@ question.
 Needs Python 3.12 or newer. No API key and no paid service.
 
 ```bash
-python -m venv .venv
-source .venv/Scripts/activate   # Git Bash. cmd.exe / PowerShell: .venv\Scripts\activate
-                                # macOS, Linux: source .venv/bin/activate
+python -m venv .venv            # python3 on most Linux distributions
+
+# one of these, for your shell:
+source .venv/bin/activate       # Linux, WSL, macOS
+source .venv/Scripts/activate   # Windows, Git Bash
+.venv\Scripts\activate          # Windows, cmd.exe or PowerShell
+
 pip install -r requirements-dev.txt
 python scripts/ingest.py        # builds the index, ~9 min, once
 streamlit run app/ui.py         # http://localhost:8501
