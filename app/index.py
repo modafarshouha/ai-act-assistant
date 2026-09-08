@@ -124,31 +124,31 @@ class HybridIndex:
         scores: dict[int, float] = {}
         dense_rank: dict[int, int] = {}
         sparse_rank: dict[int, int] = {}
-        for rank, (chunk_id, _) in enumerate(dense, start=1):
-            scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (RRF_K + rank)
-            dense_rank[chunk_id] = rank
-        for rank, (chunk_id, _) in enumerate(sparse, start=1):
-            scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (RRF_K + rank)
-            sparse_rank[chunk_id] = rank
+        for rank, (row, _) in enumerate(dense, start=1):
+            scores[row] = scores.get(row, 0.0) + 1.0 / (RRF_K + rank)
+            dense_rank[row] = rank
+        for rank, (row, _) in enumerate(sparse, start=1):
+            scores[row] = scores.get(row, 0.0) + 1.0 / (RRF_K + rank)
+            sparse_rank[row] = rank
 
         adjusted: dict[int, float] = {}
-        for chunk_id, score in scores.items():
-            chunk = self.chunks[chunk_id]
+        for row, score in scores.items():
+            chunk = self.chunks[row]
             # Quoting a repealed date as current law is a correctness bug, so
             # drop these outright. Demoting them is not enough.
             if not include_superseded and not chunk.is_current:
                 continue
             if chunk.kind == "recital":
                 score *= RECITAL_WEIGHT
-            adjusted[chunk_id] = score
+            adjusted[row] = score
 
         ordered = sorted(adjusted.items(), key=lambda item: (-item[1], item[0]))
         return [
             Hit(
-                chunk=self.chunks[chunk_id],
+                chunk=self.chunks[row],
                 score=score,
-                dense_rank=dense_rank.get(chunk_id),
-                sparse_rank=sparse_rank.get(chunk_id),
+                dense_rank=dense_rank.get(row),
+                sparse_rank=sparse_rank.get(row),
             )
-            for chunk_id, score in ordered[:k]
+            for row, score in ordered[:k]
         ]

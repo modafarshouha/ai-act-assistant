@@ -72,11 +72,15 @@ class TraceEvent:
 
 
 def dedup_chunks(existing: list[RetrievedChunk], incoming: list[RetrievedChunk]):
-    """Merge by chunk id, keeping the better score.
+    """Merge by chunk id, keeping the better score, best first.
 
     Retrieval fans out over subtasks and runs again on a retry, so the same
     passage arrives more than once. Appending blindly repeats it in the prompt
     and pays for it twice out of the context budget.
+
+    The order is load-bearing: as the reducer for `AgentState.contexts` it sets
+    the [n] numbering in the synthesis prompt, and so what each marker resolves
+    to in the final citations.
     """
     merged: dict[str, RetrievedChunk] = {}
     for chunk in [*existing, *incoming]:

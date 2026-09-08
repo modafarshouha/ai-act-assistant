@@ -115,7 +115,7 @@ for turn in st.session_state["turns"]:
         with st.expander("How this answer was reached"):
             render_trace(turn["result"])
 
-if question := st.chat_input("Ask a compliance question..."):
+if question := st.chat_input("Ask a compliance question...", max_chars=500):
     history = []
     for turn in st.session_state["turns"][-3:]:
         history.append(Message("user", turn["question"]))

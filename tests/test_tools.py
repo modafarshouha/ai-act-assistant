@@ -5,7 +5,7 @@ from app.tools import all_tiers, compute_penalty, dispatch, lookup_deadline
 BIG = 800_000_000
 
 
-def test_every_tier_is_reachable(settings):
+def test_every_tier_in_the_data_file_is_declared(settings):
     tiers = all_tiers(settings)
     assert set(tiers) == {
         "aia_prohibited",
@@ -109,6 +109,11 @@ def test_dispatch_reports_invalid_arguments_without_raising():
 def test_dispatch_reports_an_unknown_tier_without_raising():
     result = dispatch("compute_penalty", {"tier_id": "nope"})
     assert not result.ok and "nope" in result.error
+
+
+def test_dispatch_reports_a_missing_deadline_without_raising():
+    result = dispatch("lookup_deadline", {"query": "zzz qqq"})
+    assert not result.ok and "no compliance date" in result.error
 
 
 def test_dispatch_carries_the_legal_basis_on_success():

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "description": "Administrative fine tiers for the AI Act and GDPR. Held as data rather than as constants in the calculator so that a corrected amount is a data change, not a code change. Every quote is located in the vendored corpus by tests/test_corpus_facts.py.",
+  "description": "Administrative fine tiers for the AI Act and GDPR. Held as data rather than as constants in the calculator so that a corrected amount is a data change, not a code change. Every quote is located in the vendored corpus by tests/test_facts.py.",
   "comparator_note": "The base tiers all resolve to the HIGHER of the fixed ceiling and the turnover percentage. Two provisions invert that comparator to the LOWER, and the inversion is the single most commonly mis-stated part of the AI Act penalty regime: AI Act Art. 99(6) inverts it for SMEs across all three tiers, while Art. 99(6a) inverts it for SMCs across paragraphs 4 and 5 only. An SMC committing a prohibited practice therefore gets no relief.",
   "regimes": [
     {

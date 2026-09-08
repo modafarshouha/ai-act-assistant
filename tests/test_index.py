@@ -29,6 +29,7 @@ def test_the_currency_filter_drops_superseded_chunks(index):
     ids = [(i, 1.0) for i in superseded[:5]]
     assert index.fuse(ids, [], k=5, include_superseded=False) == []
     assert len(index.fuse(ids, [], k=5, include_superseded=True)) == 5
+    assert index.fuse(ids, [], k=5) == []  # the default must honour prefer_current_law
 
 
 def test_recitals_are_down_weighted_against_articles(index):

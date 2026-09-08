@@ -109,7 +109,7 @@ def compute_penalty(
             "legal_basis": f"{regime['regulation']} Art. {tier['paragraph']}",
             "modifier": None,
             "caveats": caveats,
-            "explanation": f"{regime['regulation']} Art. {tier['paragraph']} sets a fixed ceiling.",
+            "description": f"{regime['regulation']} Art. {tier['paragraph']} sets a fixed ceiling.",
         }
 
     if entity == "non_undertaking":
@@ -145,13 +145,13 @@ def compute_penalty(
                 (fixed, "fixed") if fixed >= turnover_limb else (turnover_limb, "turnover")
             )
 
-    explanation = (
+    description = (
         f"{regime['regulation']} Art. {tier['paragraph']}: EUR {fixed:,.0f} or "
         f"{tier['turnover_pct']:g}% of total worldwide annual turnover, whichever is "
         f"{comparator}"
     )
     if modifier:
-        explanation += f", as modified for {ENTITY_LABELS[entity]} by Art. {modifier['paragraph']}"
+        description += f", as modified for {ENTITY_LABELS[entity]} by Art. {modifier['paragraph']}"
 
     return {
         "ceiling_eur": round(ceiling, 2),
@@ -161,7 +161,7 @@ def compute_penalty(
         "legal_basis": f"{regime['regulation']} Art. {tier['paragraph']}",
         "modifier": modifier["paragraph"] if modifier else None,
         "caveats": caveats,
-        "explanation": explanation + ".",
+        "description": description + ".",
     }
 
 
@@ -255,10 +255,12 @@ TOOLS = {
 
 
 def dispatch(name: str, args: dict[str, Any], settings: Settings | None = None) -> ToolResult:
-    """Run a tool. Never raises; failures come back as a readable result.
+    """Run a tool. Argument and lookup failures come back as a readable result.
 
     A malformed argument should cost the tool's contribution and nothing else.
-    Retrieval can still carry a decent answer on its own.
+    Retrieval can still carry a decent answer on its own. Environment failures
+    are not converted: a missing `penalties.json` or `deadlines.json` raises
+    `FileNotFoundError` straight out of here.
     """
     settings = settings or get_settings()
     started = time.perf_counter()

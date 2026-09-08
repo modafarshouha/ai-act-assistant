@@ -1,6 +1,7 @@
 import pytest
 
 from app.agent import (
+    _TIER_PATTERNS,
     _canonical_numbers,
     check_groundedness,
     classify_scope,
@@ -10,7 +11,7 @@ from app.agent import (
     run_config,
 )
 from app.state import AgentState, Gap, RetrievedChunk, Subtask, Verification
-from app.tools import dispatch
+from app.tools import all_tiers, dispatch
 
 
 def chunk(body: str, marker: int = 1) -> RetrievedChunk:
@@ -59,7 +60,7 @@ def test_a_follow_up_stays_in_scope_via_history():
     from app.state import Message
 
     history = [Message("user", "What is the fine for a prohibited AI practice?")]
-    assert classify_scope("What about SMEs?", history)[0] == "in_scope"
+    assert classify_scope("What about them?", history)[0] == "in_scope"
 
 
 # planning
@@ -71,6 +72,7 @@ def test_a_follow_up_stays_in_scope_via_history():
         ("a company with EUR 800 million turnover", 800_000_000),
         ("turnover of EUR 50m", 50_000_000),
         ("turnover EUR 2 billion", 2_000_000_000),
+        ("turnover of 1 234 567 890 123 euros", 1_234_567_890_123),
         ("no figure here", None),
     ],
 )
@@ -83,6 +85,31 @@ def test_a_penalty_question_selects_the_calculator():
     assert task.tool_name == "compute_penalty"
     assert task.tool_args["tier_id"] == "aia_prohibited"
     assert task.needs_retrieval and task.needs_tool
+
+
+def test_a_penalties_phrasing_selects_the_calculator():
+    task = classify_subtask("What are the penalties for a prohibited AI practice?", 0)
+    assert task.tool_name == "compute_penalty"
+    assert task.tool_args["tier_id"] == "aia_prohibited"
+
+
+def test_a_prohibited_practice_by_an_eu_body_gets_article_100_2():
+    task = classify_subtask(
+        "What fine can a Union institution face for a prohibited AI practice?", 0
+    )
+    assert task.tool_args["tier_id"] == "aia_eu_body_prohibited"
+
+
+def test_any_other_eu_body_infringement_gets_article_100_3():
+    task = classify_subtask(
+        "What fine can an EU institution face for failing to keep logs?", 0
+    )
+    assert task.tool_args["tier_id"] == "aia_eu_body_other"
+
+
+def test_every_penalty_tier_is_reachable_from_the_router(settings):
+    """A tier the router can never name is a tier the calculator never returns."""
+    assert {name for name, _ in _TIER_PATTERNS} | {"aia_obligations"} == set(all_tiers(settings))
 
 
 def test_smc_is_not_mistaken_for_sme():
@@ -169,6 +196,13 @@ def test_a_refusal_needs_no_citation():
     assert check_groundedness(state).grounded
 
 
+def test_a_refusal_in_the_models_own_words_needs_no_citation():
+    """Nothing retrieved means nothing to cite, whatever words the model chose."""
+    state = AgentState(question="q", draft="I cannot answer this from the retrieved passages.",
+                       contexts=[], tool_results=[])
+    assert check_groundedness(state).grounded
+
+
 # the graph end to end
 
 
@@ -234,13 +268,13 @@ def test_the_retry_cycle_is_bounded(graph, settings):
         initial_state("What is the fine for a prohibited AI practice?", None, settings),
         run_config(settings),
     )
-    assert result["retries"] <= settings.max_retries + 1
+    assert result["retries"] == settings.max_retries + 1
     assert not result["verification"].grounded
     assert "could not be traced" in result["answer"]
 
 
 def graph_index_of(_graph):
-    """The compiled graph closes over the index; tests rebuild from the fixture."""
+    """The compiled graph closes over its index and does not expose it; reload from disk."""
     from app.config import get_settings
     from app.index import HybridIndex
 

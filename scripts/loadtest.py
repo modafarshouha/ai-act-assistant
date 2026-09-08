@@ -2,6 +2,7 @@
 
     python scripts/loadtest.py                    # 100 requests, serial
     python scripts/loadtest.py -n 100 -c 4        # four at a time
+    python scripts/loadtest.py --json out.json    # plus a JSON report
 
 Concurrency here measures contention, not capacity. The embedding and reranking
 models get one ONNX thread each, so raising it mostly queues work. Throughput is
@@ -40,6 +41,8 @@ class Sample:
 
 
 def percentile(values: list[float], pct: float) -> float:
+    if not values:
+        return 0.0
     ordered = sorted(values)
     index = max(0, min(len(ordered) - 1, round(pct / 100 * len(ordered) + 0.5) - 1))
     return ordered[index]

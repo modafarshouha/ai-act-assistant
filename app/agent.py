@@ -1,8 +1,8 @@
 """LangGraph agent. 7 nodes, 3 routers, one retry loop.
 
-    START -> triage -> planner -> [retrieve | tools] -> synthesize -> verify
-                |                                                      |
-                +-> finalize <-----------------------------------------+
+    START -> triage -> planner -> retrieve (+ tool_executor) -> synthesize -> verify
+                |                                                              |
+                +-> finalize <-------------------------------------------------+
                                 (ungrounded, retries left -> planner)
 
 Only planner and synthesize call the model. Everything else is plain Python.
@@ -52,12 +52,16 @@ _INJECTION = re.compile(
     re.IGNORECASE,
 )
 
+_EU_BODY = r"(?:union institution\w*|eu institution\w*|edps)"
+_PROHIBITION = r"(?:prohibit\w*|banned|forbidden|article 5|art\.? 5)"
+
 # First match wins. Specific tiers before the catch-all.
 _TIER_PATTERNS = (
+    # Art. 100(2) needs an EU body *and* a prohibition, in either order.
     ("aia_eu_body_prohibited",
-     re.compile(r"\b(union institution\w*|eu institution\w*|edps)\b", re.I)),
-    ("aia_prohibited",
-     re.compile(r"\b(prohibit\w*|banned|forbidden|article 5|art\.? 5)\b", re.I)),
+     re.compile(rf"^(?=.*\b{_EU_BODY}\b)(?=.*\b{_PROHIBITION}\b)", re.I | re.S)),
+    ("aia_eu_body_other", re.compile(rf"\b{_EU_BODY}\b", re.I)),
+    ("aia_prohibited", re.compile(rf"\b{_PROHIBITION}\b", re.I)),
     ("aia_misinformation",
      re.compile(r"\b(incorrect|misleading|incomplete)\w*\s+information\b", re.I)),
     ("gdpr_upper", re.compile(r"\bgdpr\b.*\b(principle|consent|data subject|transfer)\w*", re.I)),
@@ -74,18 +78,20 @@ _ENTITY_PATTERNS = (
 )
 
 _TURNOVER = re.compile(
-    r"(?:eur\s*|€\s*)?([\d][\d,. ]*)\s*(bn|billion|m|million|k|thousand)?\b.{0,24}turnover"
-    r"|turnover.{0,24}?(?:eur\s*|€\s*)?([\d][\d,. ]*)\s*(bn|billion|m|million|k|thousand)?",
+    r"(?:eur\s*|€\s*)?([\d][\d,. ]{0,30})\s*(bn|billion|m|million|k|thousand)?\b.{0,24}turnover"
+    r"|turnover.{0,24}?(?:eur\s*|€\s*)?([\d][\d,. ]{0,30})\s*(bn|billion|m|million|k|thousand)?",
     re.IGNORECASE,
 )
 _MULTIPLIERS = {"bn": 1e9, "billion": 1e9, "m": 1e6, "million": 1e6, "k": 1e3, "thousand": 1e3}
 
-_ASKS_PENALTY = re.compile(r"\b(fine|fines|penalt|how much|maximum|ceiling|cap)\b", re.I)
+_ASKS_PENALTY = re.compile(
+    r"\b(fine\w*|penalt\w*|how much|maximum\w*|ceiling\w*|cap|caps)\b", re.I
+)
 # "Did the date for Annex III obligations change?" asks about timing without
 # using "when". Over-triggering costs nothing: a miss returns ok=False and the
 # answer falls back on the passages.
 _ASKS_DEADLINE = re.compile(
-    r"\b(when|deadline|date|how long|apply from|applicable from|come into|in force|"
+    r"\b(when|deadline\w*|date\w*|how long|apply from|applicable from|come into|in force|"
     r"start to apply|starts? applying|days until|chang\w+|defer\w*|postpon\w*|delay\w*)\b",
     re.I,
 )
@@ -101,10 +107,11 @@ _NUMBER = re.compile(r"\d+(?:[ ,]\d{3})+|\d+(?:\.\d+)?")
 def classify_scope(question: str, history: list[Message] | None = None) -> tuple[str, str]:
     """Keyword gate. Loose on purpose.
 
-    Only rejects questions obviously about something else. The real decision is
-    made after retrieval, where the cross-encoder separates off-topic queries
-    cleanly. Loose here and strict there costs one wasted retrieval on a bad
-    question and avoids refusing a good one.
+    Rejects empty input, prompt injection, and questions obviously about
+    something else. The real decision is made after retrieval, where the
+    cross-encoder separates off-topic queries cleanly. Loose here and strict
+    there costs one wasted retrieval on a bad question and avoids refusing a
+    good one.
     """
     text = question.lower().strip()
     if not text:
@@ -180,7 +187,7 @@ def check_groundedness(state: AgentState) -> Verification:
         if not 1 <= marker <= len(contexts):
             gaps.append(Gap("unresolved_citation", f"[{marker}] does not match a passage."))
 
-    refusing = "do not contain an answer" in draft
+    refusing = not contexts or "do not contain an answer" in draft
     if not markers and not refusing:
         gaps.append(Gap("no_citation", "The answer cites no passage."))
 

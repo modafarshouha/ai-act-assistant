@@ -35,6 +35,10 @@ def test_every_tier_amount_appears_in_its_quote(settings):
         for tier in regime["tiers"]:
             spaced = f"{tier['amount_eur']:,}".replace(",", " ")
             assert spaced in normalize(tier["quote"]), f"{tier['id']} amount not in its quote"
+            if tier["turnover_pct"] is not None:
+                assert f"{tier['turnover_pct']:g} %" in normalize(tier["quote"]), (
+                    f"{tier['id']} turnover_pct not in its quote"
+                )
 
 
 def test_verbatim_deadline_quotes_appear_in_their_source(settings, source_text):

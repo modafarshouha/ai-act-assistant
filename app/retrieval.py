@@ -1,14 +1,14 @@
-"""RAG subgraph: embed, search, rerank, select, with one widening retry.
+"""RAG subgraph: embed, search, rerank, select.
 
-Its own graph because the stages carry state the agent wants afterwards (what
-was retrieved, what got scored, what was dropped), and because select can send
-the search back for a wider second pass. Without that branch it would just be a
-function. The agent's retrieve node invokes this and maps the result across.
+Its own graph because the stages carry state the agent wants afterwards: what
+was retrieved, what got scored, and what was dropped. The agent's retrieve node
+invokes this and maps the result across, and scripts/evaluate.py reads the same
+intermediate state to score the pool separately from the ranking.
 """
 
 import time
 from dataclasses import dataclass
-from typing import Annotated, Any, Literal, TypedDict
+from typing import Annotated, Any, TypedDict
 
 import numpy as np
 from langchain_core.runnables import RunnableConfig
@@ -94,8 +94,6 @@ class RetrievalState(TypedDict, total=False):
     fused: list[Hit]
     ranked: list[Ranked]
     context: Context
-    widened: bool
-    retry: bool
     timings: Annotated[dict[str, float], lambda a, b: {**a, **b}]
 
 
@@ -115,15 +113,12 @@ def build_retrieval_graph(index: HybridIndex, settings: Settings | None = None):
 
     def search(state: RetrievalState) -> dict[str, Any]:
         started = time.perf_counter()
-        # Second pass widens the net instead of reshuffling. If the answer was
-        # outside the first pool, reordering it won't help.
-        spread = 3 if state.get("widened") else 1
-        dense = index.search_dense(state["vector"], settings.dense_k * 2 * spread)
-        sparse = index.search_sparse(state["question"], settings.sparse_k * 2 * spread)
+        dense = index.search_dense(state["vector"], settings.dense_k * 2)
+        sparse = index.search_sparse(state["question"], settings.sparse_k * 2)
         fused = index.fuse(
             dense,
             sparse,
-            settings.fused_k * spread,
+            settings.fused_k,
             include_superseded=state.get("include_superseded"),
         )
         return {"fused": fused, "timings": _timed("search", started)}
@@ -136,18 +131,7 @@ def build_retrieval_graph(index: HybridIndex, settings: Settings | None = None):
     def select(state: RetrievalState) -> dict[str, Any]:
         started = time.perf_counter()
         context = build_context(state["ranked"], settings)
-        update: dict[str, Any] = {"context": context, "timings": _timed("select", started)}
-        if not context.selected and not context.out_of_scope and not state.get("widened"):
-            update["widened"] = True
-            update["retry"] = True
-        else:
-            update["retry"] = False
-        return update
-
-    def route(state: RetrievalState) -> Literal["search", "__end__"]:
-        # widened is set in the same update as retry, and a conditional edge
-        # sees the write its own node just made, so this fires at most once.
-        return "search" if state.get("retry") else END
+        return {"context": context, "timings": _timed("select", started)}
 
     builder = StateGraph(RetrievalState)
     builder.add_node("embed", embed)
@@ -159,7 +143,7 @@ def build_retrieval_graph(index: HybridIndex, settings: Settings | None = None):
     builder.add_edge("embed", "search")
     builder.add_edge("search", "rerank")
     builder.add_edge("rerank", "select")
-    builder.add_conditional_edges("select", route, ["search", END])
+    builder.add_edge("select", END)
 
     return builder.compile()
 
@@ -170,7 +154,6 @@ class RetrievalResult:
     ranked: list[Ranked]
     fused: list[Hit]
     timings: dict[str, float]
-    widened: bool
 
     @property
     def out_of_scope(self) -> bool:
@@ -199,7 +182,6 @@ def retrieve(
         {
             "question": question,
             "include_superseded": include_superseded,
-            "widened": False,
             "timings": {},
         },
         RunnableConfig(recursion_limit=settings.recursion_limit),
@@ -209,5 +191,4 @@ def retrieve(
         ranked=final.get("ranked", []),
         fused=final.get("fused", []),
         timings=final.get("timings", {}),
-        widened=bool(final.get("widened")),
     )

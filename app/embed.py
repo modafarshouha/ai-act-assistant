@@ -96,5 +96,7 @@ def _embed_query_cached(text: str) -> np.ndarray:
 
 
 def embed_query(text: str, settings: Settings | None = None) -> np.ndarray:
+    # settings is accepted for call-site symmetry and ignored: the cached helper
+    # resolves the model from get_settings() and keys only on text.
     # Copy, or a caller mutating the result corrupts the cache.
     return _embed_query_cached(text).copy()

@@ -1,7 +1,8 @@
-"""Retrieval and routing metrics against eval/questions.yaml.
+"""Retrieval and graph metrics against eval/questions.yaml.
 
     python scripts/evaluate.py
     python scripts/evaluate.py --answers      # needs LLM_PROVIDER=ollama
+    python scripts/evaluate.py --json out.json
 """
 
 import argparse
@@ -185,7 +186,7 @@ def report(title: str, section: dict) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--answers", action="store_true", help="also score answer text")
-    parser.add_argument("--json", type=Path)
+    parser.add_argument("--json", type=Path, help="write metrics as JSON")
     args = parser.parse_args()
 
     settings = get_settings()

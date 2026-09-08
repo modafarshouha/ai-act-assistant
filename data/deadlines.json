@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "description": "Compliance dates for the AI Act and GDPR, each tied to the provision that establishes it. Entries marked verbatim=true carry a quote that tests/test_corpus_facts.py locates in the vendored corpus, so a date cannot drift away from its legal basis without failing the suite. Entries marked verbatim=false are arithmetic or inference from a quoted provision; their reasoning is stated in full.",
+  "description": "Compliance dates for the AI Act and GDPR, each tied to the provision that establishes it. Entries marked verbatim=true carry a quote that tests/test_facts.py locates in the vendored corpus, so a date cannot drift away from its legal basis without failing the suite. Entries marked verbatim=false are arithmetic or inference from a quoted provision; their reasoning is stated in full.",
   "corpus_basis": {
     "current_law": "ai_act_consolidated (02024R1689-20260727), gdpr (32016R0679)",
     "point_in_time": "ai_act_original (32024R1689)",
@@ -176,6 +176,58 @@
       "verbatim": true,
       "quote": "It shall apply from 25 May 2018.",
       "reasoning": "Included so that questions spanning both regulations can be answered on a common timeline.",
+      "amended_by": null
+    },
+    {
+      "id": "aia_legacy_gpai_models",
+      "regulation": "AI Act",
+      "date": "2027-08-02",
+      "status": "upcoming",
+      "subject": "Legacy general-purpose AI models: models already placed on the market before 2 August 2025 must be brought into compliance.",
+      "legal_basis": "AI Act Art. 111(3)",
+      "source_key": "ai_act_consolidated",
+      "verbatim": true,
+      "quote": "Providers of general-purpose AI models that have been placed on the market before 2 August 2025 shall take the necessary steps in order to comply with the obligations laid down in this Regulation by 2 August 2027.",
+      "reasoning": "Article 111 is the transitional regime for systems and models already on the market. A general-purpose AI model placed on the market before the 2 August 2025 application date of Chapter V is not in breach on that date: the obligations bite on 2 August 2027. Answering with the Art. 113(b) date instead understates the runway by two years.",
+      "amended_by": null
+    },
+    {
+      "id": "aia_legacy_synthetic_content",
+      "regulation": "AI Act",
+      "date": "2026-12-02",
+      "status": "upcoming",
+      "subject": "Legacy AI systems generating synthetic audio, image, video or text content, already placed on the market: the Art. 50(2) marking duty.",
+      "legal_basis": "AI Act Art. 111(4)",
+      "source_key": "ai_act_consolidated",
+      "verbatim": true,
+      "quote": "Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content, that have been placed on the market before 2 August 2026 shall take the necessary steps in order to comply with Article 50(2) by 2 December 2026.",
+      "reasoning": "Added by the Digital Omnibus. Systems placed on the market before 2 August 2026 have until 2 December 2026 to comply with the Art. 50(2) machine-readable marking obligation. This paragraph did not exist in the original AI Act.",
+      "amended_by": "Regulation (EU) 2026/1744"
+    },
+    {
+      "id": "aia_legacy_public_authority_highrisk",
+      "regulation": "AI Act",
+      "date": "2030-08-02",
+      "status": "upcoming",
+      "subject": "Legacy high-risk AI systems intended to be used by public authorities, already placed on the market or put into service.",
+      "legal_basis": "AI Act Art. 111(2)",
+      "source_key": "ai_act_consolidated",
+      "verbatim": true,
+      "quote": "the providers and deployers of high-risk AI systems intended to be used by public authorities shall take the necessary steps to comply with the requirements and obligations laid down in this Regulation by 2 August 2030",
+      "reasoning": "Other legacy high-risk systems fall outside the Regulation unless they undergo significant changes in design, but systems intended to be used by public authorities carry a hard date of 2 August 2030. The Digital Omnibus replaced this paragraph, swapping the fixed trigger date for the date of application of Chapter III; the 2030 date itself is in both versions.",
+      "amended_by": "Regulation (EU) 2026/1744"
+    },
+    {
+      "id": "aia_legacy_annex_x_it_systems",
+      "regulation": "AI Act",
+      "date": "2030-12-31",
+      "status": "upcoming",
+      "subject": "Legacy AI systems that are components of the large-scale EU IT systems listed in Annex X, placed on the market before 2 August 2027.",
+      "legal_basis": "AI Act Art. 111(1)",
+      "source_key": "ai_act_consolidated",
+      "verbatim": true,
+      "quote": "AI systems which are components of the large-scale IT systems established by the legal acts listed in Annex X that have been placed on the market or put into service before 2 August 2027 shall be brought into compliance with this Regulation by 31 December 2030",
+      "reasoning": "The longest transitional runway in the Regulation. Components of the Annex X large-scale IT systems placed on the market before 2 August 2027 must be brought into compliance by 31 December 2030, and the requirements are to be taken into account when those systems are next evaluated.",
       "amended_by": null
     }
   ]
