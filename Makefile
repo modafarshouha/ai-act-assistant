@@ -1,7 +1,11 @@
-PYTHON := $(if $(wildcard .venv/Scripts/python.exe),.venv/Scripts/python.exe,.venv/bin/python)
+# Creates the venv. On most Linux distributions: make install SYS_PYTHON=python3
+SYS_PYTHON ?= python
+# Inside the venv. Resolved by the shell each time, so it is correct in the same
+# run that install creates the venv.
+PYTHON = $$(test -x .venv/Scripts/python.exe && echo .venv/Scripts/python.exe || echo .venv/bin/python)
 
 install:
-	python -m venv .venv
+	$(SYS_PYTHON) -m venv .venv
 	$(PYTHON) -m pip install -r requirements-dev.txt
 
 ingest:
