@@ -1,4 +1,4 @@
-PYTHON := .venv/Scripts/python.exe
+PYTHON := $(if $(wildcard .venv/Scripts/python.exe),.venv/Scripts/python.exe,.venv/bin/python)
 
 install:
 	python -m venv .venv

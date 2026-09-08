@@ -279,6 +279,8 @@ python scripts/evaluate.py --json eval/results/eval.json
 python scripts/loadtest.py -n 100 -c 1
 ```
 
+Optional: `make test`, `make lint`, `make ingest`, `make ui`.
+
 ## Limitations
 
 - Not legal advice. It reports what the regulations say. Only the Official
