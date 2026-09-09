@@ -151,12 +151,10 @@ vendored from the Publications Office, 1,194 chunks, each below the model's
 ## Design decisions
 
 **Two LLM calls per question.** The planner and the synthesiser. Triage, tool
-dispatch, fine arithmetic and groundedness are plain Python. A 0.5b model asked
-to check its own figures sounds equally sure whichever way it answers.
+dispatch, fine arithmetic and groundedness are plain Python.
 
 **The model never does arithmetic.** Ceilings come from a calculator reading
-`data/penalties.json`. Art. 99(6) flips SMEs to the lower limb across all three
-tiers; Art. 99(6a) flips SMCs across paragraphs 4 and 5 only.
+`data/penalties.json`.
 
 **Superseded law.** `index.fuse` drops non-current chunks from the candidate
 pool. The original AI Act stays indexed, reachable by asking what the text said
@@ -169,9 +167,7 @@ in the question, a passage, or a tool result.
 **Model choice: `qwen2.5:0.5b-instruct` via Ollama.** Open weights, Apache-2.0,
 CPU-only, no paid API.
 
-The default provider is a deterministic double that quotes retrieved passages,
-so a fresh clone runs with no model download and the tests are reproducible.
-`scripts/evaluate.py --answers` refuses to run in that mode.
+The default provider is a deterministic double that quotes retrieved passages.
 
 ## Results
 
@@ -213,7 +209,6 @@ Raw output is committed in [`eval/results/`](eval/results).
 Bottleneck: the cross-encoder inside `retrieve`. Optimisations: score fewer and
 shorter candidates (`RERANK_CANDIDATES`, `RERANK_MAX_CHARS`), and batch at the
 reranker so concurrent requests share one forward pass.
-
 
 ## Task requirements
 
