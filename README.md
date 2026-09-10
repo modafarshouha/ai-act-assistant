@@ -252,9 +252,6 @@ python scripts/loadtest.py -n 100 -c 1                     # latency under load
   previous question.
 - Ollama is wired up but not benchmarked. The latency figures above are for the
   deterministic provider; with a real model, generation dominates.
-- The image is 1.91 GB. Most of that is the Python base plus Streamlit, FAISS
-  and ONNX Runtime, with the two models adding about 220 MB. Trimming it means
-  dropping Streamlit from the runtime stage and serving the UI separately.
 
 ## Copyright and Legal Notices
 
