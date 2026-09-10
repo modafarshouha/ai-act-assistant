@@ -256,11 +256,12 @@ python scripts/loadtest.py -n 100 -c 1                     # latency under load
   and ONNX Runtime, with the two models adding about 220 MB. Trimming it means
   dropping Streamlit from the runtime stage and serving the UI separately.
 
-## Licence
+## Copyright and Legal Notices
 
-Regulation texts © European Union, 1998–2026, reused under Commission Decision
-2011/833/EU. Source: [EUR-Lex](https://eur-lex.europa.eu). See
-`data/raw/SOURCES.md` for provenance and hashes.
+Copyright (c) 2026 Modafar Al-Shouha. All rights reserved.
 
-> Only the legislation published in the printed edition of the Official Journal
-> of the European Union is deemed authentic.
+This code was created for evaluation purposes and may not be copied, modified, distributed, or used commercially without the express written permission of the author.
+
+Regulation texts © European Union, 1998–2026, reused under Commission Decision 2011/833/EU. Source: [EUR-Lex](https://eur-lex.europa.eu). See `data/raw/SOURCES.md` for provenance and hashes.
+
+> Only the legislation published in the printed edition of the Official Journal of the European Union is deemed authentic.
